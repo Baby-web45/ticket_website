@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ train.name }} - Premium Train Booking{% endblock %}
+
+{% block content %}
+<section class="pt-5 mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('trains') }}">Trains</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ train.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Train Info -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <img src="{{ url_for('static', filename='images/' + train.image) }}" class="card-img-top" alt="{{ train.name }}" style="height: 350px; object-fit: cover;"
+                         onerror="this.src='{{ url_for('static', filename='images/default_train.jpg') }}'">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h2 class="card-title">{{ train.name }}</h2>
+                                <p class="text-muted">
+                                    <i class="fas fa-hashtag"></i> Train No: {{ train.number }}
+                                </p>
+                            </div>
+                            <span class="badge bg-primary p-2">
+                                <i class="fas fa-star"></i> {{ train.rating }} ★
+                            </span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 text-center">
+                                    <i class="fas fa-location-dot text-primary fs-3"></i>
+                                    <h6 class="mt-2">From</h6>
+                                    <strong>{{ train.source }}</strong>
+                                    <br>
+                                    <small class="text-muted">Departs: {{ train.departure }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 text-center">
+                                    <i class="fas fa-arrow-right text-primary fs-3"></i>
+                                    <h6 class="mt-2">Journey</h6>
+                                    <strong>{{ train.departure }} - {{ train.arrival }}</strong>
+                                    <br>
+                                    <small class="text-muted">via {{ train.source }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded-4 text-center">
+                                    <i class="fas fa-flag-checkered text-primary fs-3"></i>
+                                    <h6 class="mt-2">To</h6>
+                                    <strong>{{ train.destination }}</strong>
+                                    <br>
+                                    <small class="text-muted">Arrives: {{ train.arrival }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5><i class="fas fa-info-circle text-primary"></i> About</h5>
+                            <p>{{ train.name }} is one of the most popular trains connecting {{ train.source }} to {{ train.destination }}. 
+                            Known for its punctuality and premium services, this train offers a comfortable journey with modern amenities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Sidebar -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 100px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Book This Train</h5>
+                        <hr>
+                        <div class="mb-3">
+                            <h6>Price per person</h6>
+                            <h3 class="text-primary">{{ format_currency(train.price) }}</h3>
+                        </div>
+
+                        <a href="{{ url_for('book', id=train.id) }}" class="btn btn-gradient w-100">
+                            <i class="fas fa-ticket-alt"></i> Book Now
+                        </a>
+
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-shield-alt text-primary"></i> Secure Booking</span>
+                            <span><i class="fas fa-headset text-primary"></i> 24/7 Support</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

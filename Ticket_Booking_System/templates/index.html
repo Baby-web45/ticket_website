@@ -1,0 +1,336 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Premium Train Booking{% endblock %}
+
+{% block content %}
+<!-- ============================================================
+HERO SECTION
+============================================================ -->
+<section class="hero" id="home">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content">
+                <span class="badge bg-primary mb-3 animate-slideLeft">
+                    <i class="fas fa-train"></i> India's Premier Railway Booking
+                </span>
+                <h1 class="animate-slideLeft delay-1">
+                    Book Your <span>Train Journey</span> With Ease
+                </h1>
+                <p class="animate-slideLeft delay-2">
+                    Experience seamless train ticket booking with the best deals, 
+                    premium services, and 24/7 customer support.
+                </p>
+                <div class="d-flex flex-wrap gap-3 animate-slideLeft delay-3">
+                    <a href="{{ url_for('trains') }}" class="btn btn-gradient btn-lg btn-shimmer">
+                        <i class="fas fa-search"></i> Book Now
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-play-circle"></i> Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 hero-train animate-floating">
+                <img src="{{ url_for('static', filename='images/train2.jpg') }}" 
+                     alt="Premium Train" 
+                     class="img-fluid rounded-4 shadow-lg"
+                     onerror="this.src='{{ url_for('static', filename='images/train1.jpg') }}'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+SEARCH SECTION
+============================================================ -->
+<section class="search-section" id="search">
+    <div class="container">
+        <div class="search-card animate-slideUp">
+            <h4 class="text-center mb-4">
+                <i class="fas fa-search text-primary me-2"></i>
+                Find Your Train
+            </h4>
+            <form action="{{ url_for('trains') }}" method="GET">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="source" class="form-label">
+                            <i class="fas fa-location-dot text-primary"></i> From
+                        </label>
+                        <input type="text" class="form-control" id="source" name="source" 
+                               placeholder="Enter station" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="destination" class="form-label">
+                            <i class="fas fa-flag-checkered text-primary"></i> To
+                        </label>
+                        <input type="text" class="form-control" id="destination" name="destination" 
+                               placeholder="Enter station" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date" class="form-label">
+                            <i class="fas fa-calendar-day text-primary"></i> Journey Date
+                        </label>
+                        <input type="date" class="form-control" id="date" name="date" 
+                               value="{{ now.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-gradient btn-lg btn-shimmer">
+                            <i class="fas fa-search"></i> Search Trains
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+POPULAR ROUTES
+============================================================ -->
+<section id="routes" style="padding-top: 0;">
+    <div class="container">
+        <div class="section-header">
+            <span class="subtitle">Top Routes</span>
+            <h2>Popular <span>Routes</span></h2>
+            <p>Discover the most traveled routes with premium services</p>
+        </div>
+        <div class="row g-4">
+            {% for route in popular_routes %}
+            <div class="col-lg-4 col-md-6 animate-on-scroll">
+                <div class="route-card">
+                    <i class="fas fa-route"></i>
+                    <h5>{{ route.from }} → {{ route.to }}</h5>
+                    <p><i class="far fa-clock"></i> {{ route.duration }} • {{ route.price }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+FEATURES
+============================================================ -->
+<section class="features" id="features">
+    <div class="container">
+        <div class="section-header">
+            <span class="subtitle">Why Choose Us</span>
+            <h2>Why Choose <span>RailPremier</span></h2>
+            <p>Experience the best train booking service with our premium features</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6 animate-on-scroll">
+                <div class="feature-box">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h5>Instant Booking</h5>
+                    <p>Book your tickets instantly with our fast and secure platform</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 animate-on-scroll delay-1">
+                <div class="feature-box">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>Secure Payments</h5>
+                    <p>100% secure transactions with multiple payment options</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 animate-on-scroll delay-2">
+                <div class="feature-box">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5>24/7 Support</h5>
+                    <p>Round-the-clock customer support for all your queries</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 animate-on-scroll delay-3">
+                <div class="feature-box">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h5>Best Deals</h5>
+                    <p>Exclusive offers and discounts on premium train bookings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+TRAIN CARDS
+============================================================ -->
+<section id="trains">
+    <div class="container">
+        <div class="section-header">
+            <span class="subtitle">Featured Trains</span>
+            <h2>Featured <span>Trains</span></h2>
+            <p>Book your journey on India's most premium trains</p>
+        </div>
+        <div class="row g-4">
+            {% for train in trains %}
+            <div class="col-lg-3 col-md-6 animate-on-scroll">
+                <div class="train-card card">
+                    <img src="{{ url_for('static', filename='images/' + train.image) }}" 
+                         class="card-img-top" 
+                         alt="{{ train.name }}"
+                         onerror="this.src='{{ url_for('static', filename='images/default_train.jpg') }}'">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ train.name }}</h5>
+                        <p class="card-text">
+                            <i class="fas fa-map-marker-alt text-primary"></i> {{ train.source }} → {{ train.destination }}
+                            <br>
+                            <i class="far fa-clock text-primary"></i> {{ train.departure }} - {{ train.arrival }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="price">{{ format_currency(train.price) }} <small>/person</small></span>
+                            <div>
+                                <span class="rating-stars">
+                                    <i class="fas fa-star"></i> {{ train.rating }}
+                                </span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('train_detail', train_id=train.id) }}" class="btn btn-gradient mt-3">
+                            <i class="fas fa-ticket-alt"></i> Book Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('trains') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-train"></i> View All Trains
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+OFFER SECTION
+============================================================ -->
+<section class="offer-section container my-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <span class="offer-badge">
+                <i class="fas fa-gift"></i> Special Offer
+            </span>
+            <h2>Get <span>50% Off</span> on Your First Booking!</h2>
+            <p>Use promo code <strong style="color: #FFD700;">FIRST50</strong> and enjoy premium train travel at half the price.</p>
+            <a href="{{ url_for('trains') }}" class="btn btn-gold btn-shimmer">
+                <i class="fas fa-rocket"></i> Claim Offer
+            </a>
+        </div>
+        <div class="col-lg-6 offer-image">
+            <i class="fas fa-ticket-alt"></i>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+STATISTICS
+============================================================ -->
+<section class="stats" id="stats">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6 stat-item animate-on-scroll">
+                <span class="stat-icon"><i class="fas fa-users"></i></span>
+                <h2>10M+</h2>
+                <p>Happy Customers</p>
+            </div>
+            <div class="col-lg-3 col-md-6 stat-item animate-on-scroll delay-1">
+                <span class="stat-icon"><i class="fas fa-train"></i></span>
+                <h2>50K+</h2>
+                <p>Trains Booked</p>
+            </div>
+            <div class="col-lg-3 col-md-6 stat-item animate-on-scroll delay-2">
+                <span class="stat-icon"><i class="fas fa-route"></i></span>
+                <h2>200+</h2>
+                <p>Routes Covered</p>
+            </div>
+            <div class="col-lg-3 col-md-6 stat-item animate-on-scroll delay-3">
+                <span class="stat-icon"><i class="fas fa-star"></i></span>
+                <h2>4.8★</h2>
+                <p>Average Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('date');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    animateElements.forEach(el => observer.observe(el));
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const statItems = document.querySelectorAll('.stat-item h2');
+    const counterObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const text = el.textContent;
+                const num = parseInt(text.replace(/[^0-9.]/g, ''));
+                if (!isNaN(num)) {
+                    let current = 0;
+                    const increment = Math.ceil(num / 50);
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= num) {
+                            current = num;
+                            clearInterval(timer);
+                        }
+                        if (text.includes('★')) {
+                            el.textContent = current + '★';
+                        } else if (text.includes('+')) {
+                            el.textContent = current + '+';
+                        } else {
+                            el.textContent = current;
+                        }
+                    }, 30);
+                }
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+    statItems.forEach(item => counterObserver.observe(item));
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                const navHeight = document.querySelector('.custom-navbar').offsetHeight;
+                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

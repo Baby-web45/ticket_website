@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}Trains - Premium Train Booking{% endblock %}
+
+{% block content %}
+<section class="pt-5 mt-5">
+    <div class="container">
+        <div class="section-header">
+            <h2>Available <span>Trains</span></h2>
+            <p>Find and book your preferred train</p>
+        </div>
+
+        <!-- Search Filters -->
+        <div class="search-card mb-5">
+            <form action="{{ url_for('trains') }}" method="GET">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="source" class="form-label">
+                            <i class="fas fa-location-dot text-primary"></i> From
+                        </label>
+                        <input type="text" class="form-control" id="source" name="source" 
+                               placeholder="Enter station" value="{{ source }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="destination" class="form-label">
+                            <i class="fas fa-flag-checkered text-primary"></i> To
+                        </label>
+                        <input type="text" class="form-control" id="destination" name="destination" 
+                               placeholder="Enter station" value="{{ destination }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date" class="form-label">
+                            <i class="fas fa-calendar-day text-primary"></i> Journey Date
+                        </label>
+                        <input type="date" class="form-control" id="date" name="date" 
+                               value="{{ date or now.strftime('%Y-%m-%d') }}">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-gradient btn-lg w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results -->
+        {% if trains %}
+            <div class="row g-4">
+                {% for train in trains %}
+                <div class="col-lg-4 col-md-6 animate-on-scroll">
+                    <div class="train-card card">
+                        <img src="{{ url_for('static', filename='images/' + train.image) }}" class="card-img-top" alt="{{ train.name }}"
+                             onerror="this.src='{{ url_for('static', filename='images/default_train.jpg') }}'">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ train.name }}</h5>
+                            <p class="card-text">
+                                <i class="fas fa-hashtag text-primary"></i> {{ train.number }}
+                                <br>
+                                <i class="fas fa-map-marker-alt text-primary"></i> {{ train.source }} → {{ train.destination }}
+                                <br>
+                                <i class="far fa-clock text-primary"></i> {{ train.departure }} - {{ train.arrival }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">{{ format_currency(train.price) }} <small>/person</small></span>
+                                <div>
+                                    <i class="fas fa-star text-warning"></i> {{ train.rating }}
+                                </div>
+                            </div>
+                            <a href="{{ url_for('train_detail', train_id=train.id) }}" class="btn btn-gradient mt-3 w-100">
+                                <i class="fas fa-ticket-alt"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-train" style="font-size: 4rem; color: var(--gray-300);"></i>
+                <h4 class="mt-3">No trains found</h4>
+                <p class="text-muted">Try adjusting your search filters</p>
+                <a href="{{ url_for('trains') }}" class="btn btn-gradient">
+                    <i class="fas fa-sync"></i> Clear Filters
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block title %}Booking Confirmation - Premium Train Booking{% endblock %}
+
+{% block content %}
+<section class="pt-5 mt-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                            <h2 class="mt-3">Booking Confirmed!</h2>
+                            <p class="text-muted">Your train ticket has been booked successfully.</p>
+                        </div>
+
+                        <div class="alert alert-success p-4 rounded-4">
+                            <h5>PNR Number</h5>
+                            <h2 class="fw-bold">{{ booking.pnr }}</h2>
+                            <small>Save this number for future reference</small>
+                        </div>
+
+                        <div class="row g-3 text-start">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">Passenger</small>
+                                    <h6 class="mb-0">{{ booking.passenger_name }}</h6>
+                                    <small>{{ booking.passenger_age }} yrs, {{ booking.passenger_gender }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">Seat Class</small>
+                                    <h6 class="mb-0">{{ booking.seat_class }}</h6>
+                                    <small>Journey Date: {{ booking.journey_date }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">From</small>
+                                    <h6 class="mb-0">{{ booking.source }}</h6>
+                                    <small>Departure: {{ booking.train_number }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">To</small>
+                                    <h6 class="mb-0">{{ booking.destination }}</h6>
+                                    <small>Train: {{ booking.train_name }}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">Amount Paid</small>
+                                    <h6 class="mb-0 text-primary">{{ format_currency(booking.amount) }}</h6>
+                                    <small>Status: <span class="badge bg-success">Confirmed</span></small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-4">
+                                    <small class="text-muted">Booking Date</small>
+                                    <h6 class="mb-0">{{ booking.booking_date }}</h6>
+                                    <small>PNR: {{ booking.pnr }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex flex-wrap gap-3 justify-content-center">
+                            <a href="{{ url_for('my_bookings') }}" class="btn btn-gradient">
+                                <i class="fas fa-ticket-alt"></i> View My Bookings
+                            </a>
+                            <a href="{{ url_for('trains') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-search"></i> Book Another
+                            </a>
+                            <button onclick="window.print()" class="btn btn-outline-secondary">
+                                <i class="fas fa-print"></i> Print Ticket
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

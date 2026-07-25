@@ -1,0 +1,484 @@
+{% extends "layout.html" %}
+
+{% block title %}Payment - Premium Train Booking{% endblock %}
+
+{% block content %}
+<section class="pt-5 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('trains') }}">Trains</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('booking', train_id=train.id) }}">Booking</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Payment</li>
+                    </ol>
+                </nav>
+
+                <!-- Alert Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4" role="alert">
+                                <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Payment Card -->
+                <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                    <div class="card-header bg-gradient-primary text-white py-4" style="background: linear-gradient(135deg, #4A00E0 0%, #8E2DE2 50%, #00D4FF 100%);">
+                        <h4 class="mb-0 text-center">
+                            <i class="fas fa-credit-card me-2"></i> Complete Your Payment
+                        </h4>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Booking Summary -->
+                        <div class="booking-summary bg-light rounded-4 p-4 mb-4">
+                            <h5 class="mb-3"><i class="fas fa-ticket-alt text-primary me-2"></i> Booking Summary</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Train</small>
+                                    <p class="fw-bold mb-0">{{ train.name }}</p>
+                                    <small class="text-muted">Train No: {{ train.number }}</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Journey Date</small>
+                                    <p class="fw-bold mb-0">{{ journey_date }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">From</small>
+                                    <p class="fw-bold mb-0">{{ train.source }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">To</small>
+                                    <p class="fw-bold mb-0">{{ train.destination }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Passenger</small>
+                                    <p class="fw-bold mb-0">{{ passenger_name }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Class</small>
+                                    <p class="fw-bold mb-0">{{ seat_class }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amount Details -->
+                        <div class="amount-details rounded-4 p-4 mb-4" style="background: linear-gradient(135deg, #4A00E0 0%, #8E2DE2 50%, #00D4FF 100%);">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <small class="text-white-50">Total Amount</small>
+                                    <h2 class="text-white mb-0">{{ format_currency(total_amount) }}</h2>
+                                    <small class="text-white-50">Including all taxes</small>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <span class="badge bg-white text-primary p-2">
+                                        <i class="fas fa-lock me-1"></i> Secure Payment
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <h5 class="mb-3"><i class="fas fa-credit-card text-primary me-2"></i> Select Payment Method</h5>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="payment-card active p-3 rounded-4 border-2" data-method="card" style="border-color: #4A00E0; cursor: pointer; transition: all 0.3s ease; background: rgba(74, 0, 224, 0.02);">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-credit-card fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0">Credit / Debit Card</h6>
+                                            <small class="text-muted">Visa, Mastercard, RuPay</small>
+                                        </div>
+                                        <div class="ms-auto">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="payment-card p-3 rounded-4 border-2" data-method="upi" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s ease;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-mobile-alt fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0">UPI</h6>
+                                            <small class="text-muted">Google Pay, PhonePe, Paytm</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="payment-card p-3 rounded-4 border-2" data-method="netbanking" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s ease;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-university fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0">Net Banking</h6>
+                                            <small class="text-muted">All major banks</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="payment-card p-3 rounded-4 border-2" data-method="wallet" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s ease;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-wallet fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0">Wallet</h6>
+                                            <small class="text-muted">Paytm, Amazon Pay</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Details Form -->
+                        <div id="cardForm">
+                            <form method="POST" action="{{ url_for('process_payment') }}">
+                                <input type="hidden" name="train_id" value="{{ train.id }}">
+                                <input type="hidden" name="passenger_name" value="{{ passenger_name }}">
+                                <input type="hidden" name="passenger_age" value="{{ passenger_age }}">
+                                <input type="hidden" name="passenger_gender" value="{{ passenger_gender }}">
+                                <input type="hidden" name="seat_class" value="{{ seat_class }}">
+                                <input type="hidden" name="journey_date" value="{{ journey_date }}">
+                                <input type="hidden" name="total_amount" value="{{ total_amount }}">
+                                <input type="hidden" name="payment_method" value="card">
+
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Card Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-0">
+                                                <i class="fas fa-credit-card"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="cardNumber" 
+                                                   placeholder="1234 5678 9012 3456" 
+                                                   maxlength="19" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiryDate" 
+                                               placeholder="MM/YY" maxlength="5" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">CVV</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="cvv" 
+                                                   placeholder="***" maxlength="4" required>
+                                            <span class="input-group-text bg-light border-0">
+                                                <i class="fas fa-question-circle text-muted" 
+                                                   data-bs-toggle="tooltip" 
+                                                   title="3 or 4 digit number on back of card"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Cardholder Name</label>
+                                        <input type="text" class="form-control" id="cardName" 
+                                               placeholder="John Doe" required>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-gradient btn-lg btn-shimmer" id="payBtn">
+                                        <i class="fas fa-lock me-2"></i> Pay {{ format_currency(total_amount) }}
+                                    </button>
+                                    <p class="text-center text-muted small mt-3">
+                                        <i class="fas fa-lock me-1"></i> Your payment is secure and encrypted
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- UPI Form (Hidden by default) -->
+                        <div id="upiForm" style="display: none;">
+                            <form method="POST" action="{{ url_for('process_payment') }}">
+                                <input type="hidden" name="train_id" value="{{ train.id }}">
+                                <input type="hidden" name="passenger_name" value="{{ passenger_name }}">
+                                <input type="hidden" name="passenger_age" value="{{ passenger_age }}">
+                                <input type="hidden" name="passenger_gender" value="{{ passenger_gender }}">
+                                <input type="hidden" name="seat_class" value="{{ seat_class }}">
+                                <input type="hidden" name="journey_date" value="{{ journey_date }}">
+                                <input type="hidden" name="total_amount" value="{{ total_amount }}">
+                                <input type="hidden" name="payment_method" value="upi">
+
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">UPI ID</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-0">
+                                                <i class="fas fa-at"></i>
+                                            </span>
+                                            <input type="text" class="form-control" name="upi_id" 
+                                                   placeholder="example@paytm" required>
+                                        </div>
+                                        <small class="text-muted">Enter your UPI ID (e.g., name@paytm, name@phonepe)</small>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">UPI App</label>
+                                        <select class="form-select" name="upi_app">
+                                            <option value="gpay">Google Pay</option>
+                                            <option value="phonepe">PhonePe</option>
+                                            <option value="paytm">Paytm</option>
+                                            <option value="amazon">Amazon Pay</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-gradient btn-lg btn-shimmer">
+                                        <i class="fas fa-lock me-2"></i> Pay {{ format_currency(total_amount) }} via UPI
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Net Banking Form (Hidden by default) -->
+                        <div id="netbankingForm" style="display: none;">
+                            <form method="POST" action="{{ url_for('process_payment') }}">
+                                <input type="hidden" name="train_id" value="{{ train.id }}">
+                                <input type="hidden" name="passenger_name" value="{{ passenger_name }}">
+                                <input type="hidden" name="passenger_age" value="{{ passenger_age }}">
+                                <input type="hidden" name="passenger_gender" value="{{ passenger_gender }}">
+                                <input type="hidden" name="seat_class" value="{{ seat_class }}">
+                                <input type="hidden" name="journey_date" value="{{ journey_date }}">
+                                <input type="hidden" name="total_amount" value="{{ total_amount }}">
+                                <input type="hidden" name="payment_method" value="netbanking">
+
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Select Bank</label>
+                                        <select class="form-select" name="bank" required>
+                                            <option value="">-- Select Bank --</option>
+                                            <option value="sbi">State Bank of India</option>
+                                            <option value="hdfc">HDFC Bank</option>
+                                            <option value="icici">ICICI Bank</option>
+                                            <option value="axis">Axis Bank</option>
+                                            <option value="kotak">Kotak Mahindra Bank</option>
+                                            <option value="yes">Yes Bank</option>
+                                            <option value="pnb">Punjab National Bank</option>
+                                            <option value="canara">Canara Bank</option>
+                                            <option value="bob">Bank of Baroda</option>
+                                            <option value="idfc">IDFC First Bank</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-gradient btn-lg btn-shimmer">
+                                        <i class="fas fa-lock me-2"></i> Pay {{ format_currency(total_amount) }} via Net Banking
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Wallet Form (Hidden by default) -->
+                        <div id="walletForm" style="display: none;">
+                            <form method="POST" action="{{ url_for('process_payment') }}">
+                                <input type="hidden" name="train_id" value="{{ train.id }}">
+                                <input type="hidden" name="passenger_name" value="{{ passenger_name }}">
+                                <input type="hidden" name="passenger_age" value="{{ passenger_age }}">
+                                <input type="hidden" name="passenger_gender" value="{{ passenger_gender }}">
+                                <input type="hidden" name="seat_class" value="{{ seat_class }}">
+                                <input type="hidden" name="journey_date" value="{{ journey_date }}">
+                                <input type="hidden" name="total_amount" value="{{ total_amount }}">
+                                <input type="hidden" name="payment_method" value="wallet">
+
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Select Wallet</label>
+                                        <select class="form-select" name="wallet" required>
+                                            <option value="">-- Select Wallet --</option>
+                                            <option value="paytm">Paytm Wallet</option>
+                                            <option value="phonepe">PhonePe Wallet</option>
+                                            <option value="amazon">Amazon Pay</option>
+                                            <option value="mobikwik">MobiKwik</option>
+                                            <option value="freecharge">FreeCharge</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Please ensure your wallet has sufficient balance.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-gradient btn-lg btn-shimmer">
+                                        <i class="fas fa-lock me-2"></i> Pay {{ format_currency(total_amount) }} via Wallet
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Secure Payment Badges -->
+                        <div class="text-center mt-4">
+                            <div class="d-flex flex-wrap justify-content-center gap-4">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/120px-Visa_Inc._logo.svg.png" 
+                                     alt="Visa" height="30" 
+                                     onerror="this.style.display='none'">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" 
+                                     alt="Mastercard" height="30"
+                                     onerror="this.style.display='none'">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/RuPay.svg/120px-RuPay.svg.png" 
+                                     alt="RuPay" height="30"
+                                     onerror="this.style.display='none'">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Paytm_logo.png/120px-Paytm_logo.png" 
+                                     alt="Paytm" height="30"
+                                     onerror="this.style.display='none'">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Google_Pay_logo.svg/120px-Google_Pay_logo.svg.png" 
+                                     alt="Google Pay" height="30"
+                                     onerror="this.style.display='none'">
+                            </div>
+                            <p class="text-muted small mt-3">
+                                <i class="fas fa-shield-alt text-success me-1"></i> 
+                                256-bit SSL encryption • PCI DSS compliant
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ============================================================
+// PAYMENT METHOD SELECTION
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentCards = document.querySelectorAll('.payment-card');
+    const cardForm = document.getElementById('cardForm');
+    const upiForm = document.getElementById('upiForm');
+    const netbankingForm = document.getElementById('netbankingForm');
+    const walletForm = document.getElementById('walletForm');
+    
+    paymentCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove active class from all
+            paymentCards.forEach(c => {
+                c.classList.remove('active');
+                c.style.borderColor = '#dee2e6';
+                c.style.background = 'transparent';
+                const checkIcon = c.querySelector('.fa-check-circle');
+                if (checkIcon) checkIcon.style.display = 'none';
+            });
+            
+            // Add active class to clicked
+            this.classList.add('active');
+            this.style.borderColor = '#4A00E0';
+            this.style.background = 'rgba(74, 0, 224, 0.02)';
+            const checkIcon = this.querySelector('.fa-check-circle');
+            if (checkIcon) checkIcon.style.display = 'block';
+            
+            // Hide all forms
+            cardForm.style.display = 'none';
+            upiForm.style.display = 'none';
+            netbankingForm.style.display = 'none';
+            walletForm.style.display = 'none';
+            
+            // Show selected form
+            const method = this.dataset.method;
+            if (method === 'card') {
+                cardForm.style.display = 'block';
+            } else if (method === 'upi') {
+                upiForm.style.display = 'block';
+            } else if (method === 'netbanking') {
+                netbankingForm.style.display = 'block';
+            } else if (method === 'wallet') {
+                walletForm.style.display = 'block';
+            }
+        });
+    });
+});
+
+// ============================================================
+// CARD NUMBER FORMATTING
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const cardNumber = document.getElementById('cardNumber');
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = this.value.replace(/\s/g, '');
+            if (value.length > 16) {
+                value = value.slice(0, 16);
+            }
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+            this.value = formatted;
+        });
+    }
+});
+
+// ============================================================
+// EXPIRY DATE FORMATTING
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const expiryDate = document.getElementById('expiryDate');
+    if (expiryDate) {
+        expiryDate.addEventListener('input', function(e) {
+            let value = this.value.replace(/\//g, '');
+            if (value.length > 4) {
+                value = value.slice(0, 4);
+            }
+            if (value.length >= 2) {
+                const month = parseInt(value.slice(0, 2));
+                if (month > 12) {
+                    this.value = '12' + (value.length > 2 ? '/' + value.slice(2) : '');
+                    return;
+                }
+            }
+            if (value.length > 2) {
+                this.value = value.slice(0, 2) + '/' + value.slice(2);
+            } else {
+                this.value = value;
+            }
+        });
+    }
+});
+
+// ============================================================
+// PAYMENT FORM SUBMISSION
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const payBtn = document.getElementById('payBtn');
+    
+    if (payBtn) {
+        payBtn.addEventListener('click', function(e) {
+            const form = this.closest('form');
+            if (form) {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
+                form.submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
